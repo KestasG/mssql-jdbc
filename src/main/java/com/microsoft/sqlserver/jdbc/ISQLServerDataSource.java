@@ -1350,4 +1350,34 @@ public interface ISQLServerDataSource extends javax.sql.CommonDataSource {
      * @return calcBigDecimalPrecision boolean value
      */
     boolean getCalcBigDecimalPrecision();
+
+    /**
+     * Returns value of 'retryExec' from Connection String.
+     *
+     * @param retryExec
+     *        indicates whether the driver should attempt to calculate precision from inputted big decimal values
+     */
+    void setRetryExec(String retryExec);
+
+    /**
+     * Sets the value for 'retryExec' property
+     *
+     * @return retryExec String value
+     */
+    String getRetryExec();
+
+    /**
+     * Returns value of 'customConfigLocation' from Connection String.
+     *
+     * @param customConfigLocation
+     *        indicates whether the driver should attempt to calculate precision from inputted big decimal values
+     */
+    void setCustomConfigLocation(String customConfigLocation);
+
+    /**
+     * Sets the value for 'customConfigLocation' property
+     *
+     * @return customConfigLocation String value
+     */
+    String getCustomConfigLocation();
 }

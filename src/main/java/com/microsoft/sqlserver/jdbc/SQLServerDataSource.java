@@ -1365,6 +1365,52 @@ public class SQLServerDataSource
     }
 
     /**
+     * Sets the 'retryExec' setting.
+     *
+     * @param retryExec
+     *        boolean property to have the driver calculate a big decimal's precision from input
+     */
+    @Override
+    public void setRetryExec(String retryExec) {
+        setStringProperty(connectionProps, SQLServerDriverStringProperty.RETRY_EXEC.toString(),
+                retryExec);
+    }
+
+    /**
+     * Returns the value for 'retryExec'.
+     *
+     * @return retryExec String value
+     */
+    @Override
+    public String getRetryExec() {
+        return getStringProperty(connectionProps, SQLServerDriverStringProperty.RETRY_EXEC.toString(),
+                SQLServerDriverStringProperty.RETRY_EXEC.getDefaultValue());
+    }
+
+    /**
+     * Sets the 'customConfigLocation' setting.
+     *
+     * @param customConfigLocation
+     *        boolean property to have the driver calculate a big decimal's precision from input
+     */
+    @Override
+    public void setCustomConfigLocation(String customConfigLocation) {
+        setStringProperty(connectionProps, SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.toString(),
+                customConfigLocation);
+    }
+
+    /**
+     * Returns the value for 'customConfigLocation'.
+     *
+     * @return computeBigDecimal boolean value
+     */
+    @Override
+    public String getCustomConfigLocation() {
+        return getStringProperty(connectionProps, SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.toString(),
+                SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.getDefaultValue());
+    }
+
+    /**
      * Sets a property string value.
      *
      * @param props

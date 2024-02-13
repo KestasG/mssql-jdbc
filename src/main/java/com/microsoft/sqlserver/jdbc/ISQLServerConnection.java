@@ -500,6 +500,38 @@ public interface ISQLServerConnection extends java.sql.Connection {
     void setCalcBigDecimalPrecision(boolean calcBigDecimalPrecision);
 
     /**
+     * Returns the current flag for retryExec.
+     *
+     * @return retryExec
+     *         Whether calculating big decimal precision from input values is enabled.
+     */
+    String getRetryExec();
+
+    /**
+     * Specifies whether to calculate precision from inputted big decimal values.
+     *
+     * @param retryExec
+     *        A boolean that indicates if the driver should calculate precision from inputted big decimal values.
+     */
+    void setRetryExec(String retryExec);
+
+    /**
+     * Returns the current flag for customConfigLocation.
+     *
+     * @return customConfigLocation
+     *         Whether calculating big decimal precision from input values is enabled.
+     */
+    String getCustomConfigLocation();
+
+    /**
+     * Specifies whether to calculate precision from inputted big decimal values.
+     *
+     * @param customConfigLocation
+     *        A boolean that indicates if the driver should calculate precision from inputted big decimal values.
+     */
+    void setCustomConfigLocation(String customConfigLocation);
+
+    /**
      * Specifies the flag for using Bulk Copy API for batch insert operations.
      * 
      * @param useBulkCopyForBatchInsert

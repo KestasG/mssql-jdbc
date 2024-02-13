@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -257,6 +258,52 @@ public class SQLServerStatement implements ISQLServerStatement {
         checkClosed();
 
         execProps = new ExecuteProperties(this);
+
+        boolean cont;
+        int retryAttempt = 0;
+
+        do {
+            cont = false;
+            try {
+                // (Re)execute this Statement with the new command
+                executeCommand(newStmtCmd);
+            } catch (SQLServerException e) {
+                ConfigRetryRule rule = ConfigRead.getInstance().searchRuleSet(e.getSQLServerError().getErrorNumber(), "statement");
+                boolean meetsQueryMatch = true;
+
+                if (rule != null && !(rule.getRetryQueries().isEmpty())) {
+                    // If query has been defined for the rule, we need to query match
+                    meetsQueryMatch = rule.getRetryQueries().contains(ConfigRead.getInstance().getLastQuery().split(" ")[0]);
+                }
+
+                if (rule != null && meetsQueryMatch) {
+                    cont = true;
+                    try {
+                        int timeToWait = rule.getWaitTimes().get(retryAttempt);
+                        try {
+                            Thread.sleep(TimeUnit.SECONDS.toMillis(timeToWait));
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
+                    } catch (IndexOutOfBoundsException exc) {
+                        if (e.getDriverErrorCode() == SQLServerException.ERROR_QUERY_TIMEOUT) {
+                            throw new SQLTimeoutException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e.getCause());
+                        } else {
+                            throw e;
+                        }
+                    }
+                    System.out.println("LOG: RETRYING"); //TODO replace print statement with logging
+                    retryAttempt++;
+                } else if (e.getDriverErrorCode() == SQLServerException.ERROR_QUERY_TIMEOUT) {
+                    throw new SQLTimeoutException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e.getCause());
+                } else {
+                    throw e;
+                }
+            } finally {
+                if (newStmtCmd.wasExecuted())
+                    lastStmtExecCmd = newStmtCmd;
+            }
+        } while (cont);
 
         try {
             // (Re)execute this Statement with the new command
@@ -810,6 +857,7 @@ public class SQLServerStatement implements ISQLServerStatement {
             loggerExternal.finer(toString() + ACTIVITY_ID + ActivityCorrelator.getCurrent().toString());
         }
         checkClosed();
+        ConfigRead.getInstance().storeLastQuery(sql);
         executeStatement(new StmtExecCmd(this, sql, EXECUTE, NO_GENERATED_KEYS));
         loggerExternal.exiting(getClassNameLogging(), "execute", null != resultSet);
         return null != resultSet;

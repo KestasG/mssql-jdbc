@@ -10,7 +10,6 @@ jobs:
         run: mvn install -Pjre11 -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: check variables
         run:
-          echo $MSSQL_JDBC_TEST_CONNECTION_PROPERTIES
           echo ${{ MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
           echo ${{ vars.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
           echo ${{ env.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}

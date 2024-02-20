@@ -11,10 +11,10 @@ jobs:
       - name: check variables
         run:
           echo ${{ vars.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
-          echo ${{ env.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
+          echo ${{ secrets.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
       - name: Run tests and collect coverage
         env:
-          connectionString: ${{ vars.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
+          connectionString: ${{ secrets.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
         run: mvn -Pjre11 -Dmssql_jdbc_test_connection_properties=$connectionString -DexcludedGroups=xSQLv15,NTLM,xUnix,MSI,reqExternalSetup,clientCertAuth,fedAuth,kerberos,DTC  -B test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4-beta

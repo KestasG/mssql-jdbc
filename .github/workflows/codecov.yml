@@ -10,7 +10,7 @@ jobs:
         run: mvn install -Pjre11 -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: Run tests and collect coverage
         env:
-          connectionString: ${{ vars.MSSQL_JDBC_T }}EST_CONNECTION_PROPERTIES
+          connectionString: ${{ vars.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
         run: mvn -Pjre11 -Dmssql_jdbc_test_connection_properties=$connectionString -DexcludedGroups=xSQLv15,NTLM,xUnix,MSI,reqExternalSetup,clientCertAuth,fedAuth,kerberos,DTC  -B test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4-beta

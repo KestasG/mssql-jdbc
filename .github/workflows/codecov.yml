@@ -15,7 +15,7 @@ jobs:
       - name: Run tests and collect coverage
         env:
           connectionString: ${{ secrets.MSSQL_JDBC_TEST_CONNECTION_PROPERTIES }}
-        run: mvn -Pjre11 -Dmssql_jdbc_test_connection_properties=$connectionString -DexcludedGroups=xSQLv15,NTLM,xUnix,MSI,reqExternalSetup,clientCertAuth,fedAuth,kerberos,DTC  -B test
+        run: mvn -Pjre11 -Dmssql_jdbc_test_connection_properties=$connectionString -DexcludedGroups=xAzureSQLDB,NTLM,xUnix,MSI,reqExternalSetup,clientCertAuth,fedAuth,kerberos,DTC -B test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4-beta
         env:

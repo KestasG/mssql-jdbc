@@ -1068,24 +1068,20 @@ public class SQLServerConnection implements ISQLServerConnection, java.io.Serial
 
     private String retryExec = SQLServerDriverStringProperty.RETRY_EXEC.getDefaultValue();
 
-    @Override
     public String getRetryExec() {
         return retryExec;
     }
 
-    @Override
     public void setRetryExec(String retryExec) {
         this.retryExec = retryExec;
     }
 
     private String customConfigLocation = SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.getDefaultValue();
 
-    @Override
     public String getCustomConfigLocation() {
         return customConfigLocation;
     }
 
-    @Override
     public void setCustomConfigLocation(String customConfigLocation) {
         this.customConfigLocation = customConfigLocation;
     }

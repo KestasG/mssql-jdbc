@@ -1,5 +1,6 @@
 package com.microsoft.sqlserver.jdbc;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 public class ConfigRetryRule {
@@ -13,7 +14,7 @@ public class ConfigRetryRule {
     private boolean isConnection = false;
     private boolean replaceExisting = false;
 
-    public ConfigRetryRule(String s) {
+    public ConfigRetryRule(String s) throws SQLServerException {
         String[] stArr = parse(s);
         addElements(stArr);
         calcWaitTime();
@@ -46,11 +47,14 @@ public class ConfigRetryRule {
         return temp.split(":");
     }
 
-    private void addElements(String[] s) {
+    private void addElements(String[] s) throws SQLServerException {
+        //+"retryExec={2714,2716:1,2*2:CREATE;2715:1,3;+4060,4070};"
         if (s.length == 1) {
+            // Only the rule has been supplied, so we assume its connection (but what if its not?)
             isConnection = true;
             retryError = appendOrReplace(s[0]); //Not quite, 1st we see if append on replace.
         } else if (s.length == 2 || s.length == 3) {
+            // Retry options have been provided
             // TODO: HANDLE MISSING VALUES
             retryError = s[0];
 
@@ -81,10 +85,22 @@ public class ConfigRetryRule {
                 //TODO set defaults
             }
             if (s.length == 3) {
+                // Query has also been provided
                 retryQueries = (s[2].equals("0") ? "" : s[2].toLowerCase());
             }
         } else {
-            // TODO: If a different length, then throw an error of some sort.
+            // If the length is not 1,2,3, then the provided option is invalid
+            // Prov
+
+            StringBuilder builder = new StringBuilder();
+
+            for (String string : s) {
+                builder.append(string);
+            }
+
+            MessageFormat form = new MessageFormat(SQLServerException.getErrString("R_InvalidRuleFormat"));
+            Object[] msgArgs = {builder.toString()};
+            throw new SQLServerException(null, form.format(msgArgs), null, 0, true);
         }
     }
 

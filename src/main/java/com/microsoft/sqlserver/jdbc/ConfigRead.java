@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,7 +19,6 @@ public class ConfigRead {
     private static String lastQuery = "";
     private static long timeLastModified;
     private static String customRetryRules = "";
-    private static String customLocation = ""; //Only set if passed in to connection string.
     private static boolean replaceFlag; // Are we replacing the list of transient errors?
     private static HashMap<Integer,ConfigRetryRule> cxnRules = new HashMap<>();
     private static HashMap<Integer,ConfigRetryRule> stmtRules = new HashMap<>();
@@ -38,28 +38,21 @@ public class ConfigRead {
         return single_instance;
     }
 
-    public void setCustomLocation(String cL) {
-        if (!cL.isEmpty()) {
-            customLocation = cL;
-            readConfig();
-        }
-    }
-
     public void setCustomRetryRules(String cRR) {
         customRetryRules = cRR;
         readConfig();
     }
 
-    public void setFromConnectionString(String custom) {
+    public void setFromConnectionString(String custom) throws SQLServerException {
         if (!custom.isEmpty()) {
             if (Character.isDigit(custom.charAt(0))) {
                 // If we start with a digit, these are rules
                 setCustomRetryRules(custom);
-            } else if (Character.isLetter(custom.charAt(0))) {
-                setCustomLocation(custom);
             } else {
-                // We got supplied some nonsense, error out
-                // TODO handle error
+                // We got supplied with a non-digit
+                MessageFormat form = new MessageFormat(SQLServerException.getErrString("R_invalidArgument"));
+                Object[] msgArgs = {custom};
+                throw new SQLServerException(null, form.format(msgArgs), null, 0, true);
             }
         }
     }
@@ -92,11 +85,7 @@ public class ConfigRead {
             }
         } else {
             try {
-                if (!customLocation.isEmpty()) {
-                    temp = readFromFile(customLocation, "");
-                } else {
-                    temp = readFromFile(null, defaultName);
-                }
+                temp = readFromFile();
             } catch (IOException e) {
                 // TODO handle IO exception
             }
@@ -157,12 +146,7 @@ public class ConfigRead {
     }
 
     private static boolean compareModified() {
-        String inputToUse;
-        if (!customLocation.isEmpty()) {
-            inputToUse = customLocation;
-        } else {
-            inputToUse = getCurrentClassPath() + defaultName;
-        }
+        String inputToUse = getCurrentClassPath() + defaultName;
 
         try {
             File f = new File(inputToUse);
@@ -172,17 +156,15 @@ public class ConfigRead {
         }
     }
 
-    private static LinkedList<String> readFromFile(String filePath, String inputFile) throws IOException {
-        if (filePath == null) {
-            filePath = getCurrentClassPath();
-        }
+    private static LinkedList<String> readFromFile() throws IOException {
+        String filePath = getCurrentClassPath();
 
         LinkedList<String> list = new LinkedList<>();
         try {
-            File f = new File(filePath + inputFile);
+            File f = new File(filePath + defaultName);
             timeLastModified = f.lastModified();
             try (BufferedReader buffer = new BufferedReader(new FileReader(f))) {
-                String readLine = "";
+                String readLine;
 
                 while ((readLine = buffer.readLine()) != null) {
                     if (readLine.startsWith("retryExec")) {

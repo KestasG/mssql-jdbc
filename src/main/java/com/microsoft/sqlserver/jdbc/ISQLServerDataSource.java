@@ -1365,19 +1365,4 @@ public interface ISQLServerDataSource extends javax.sql.CommonDataSource {
      * @return retryExec String value
      */
     String getRetryExec();
-
-    /**
-     * Returns value of 'customConfigLocation' from Connection String.
-     *
-     * @param customConfigLocation
-     *        indicates whether the driver should attempt to calculate precision from inputted big decimal values
-     */
-    void setCustomConfigLocation(String customConfigLocation);
-
-    /**
-     * Sets the value for 'customConfigLocation' property
-     *
-     * @return customConfigLocation String value
-     */
-    String getCustomConfigLocation();
 }

@@ -289,9 +289,6 @@ public class SQLServerConnectionTest extends AbstractTest {
         ds.setRetryExec(stringPropValue);
         assertEquals(stringPropValue, ds.getRetryExec(), TestResource.getResource("R_valuesAreDifferent"));
 
-        ds.setCustomConfigLocation(stringPropValue);
-        assertEquals(stringPropValue, ds.getCustomConfigLocation(), TestResource.getResource("R_valuesAreDifferent"));
-
         ds.setHostNameInCertificate(stringPropValue);
         assertEquals(stringPropValue, ds.getHostNameInCertificate(), TestResource.getResource("R_valuesAreDifferent"));
 

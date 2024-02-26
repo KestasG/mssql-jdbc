@@ -527,8 +527,6 @@ public class RequestBoundaryMethodsTest extends AbstractTest {
         verifiedMethodNames.add("setCalcBigDecimalPrecision");
         verifiedMethodNames.add("getRetryExec");
         verifiedMethodNames.add("setRetryExec");
-        verifiedMethodNames.add("getCustomConfigLocation");
-        verifiedMethodNames.add("setCustomConfigLocation");
         return verifiedMethodNames;
     }
 }

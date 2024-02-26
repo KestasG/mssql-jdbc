@@ -1076,16 +1076,6 @@ public class SQLServerConnection implements ISQLServerConnection, java.io.Serial
         this.retryExec = retryExec;
     }
 
-    private String customConfigLocation = SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.getDefaultValue();
-
-    public String getCustomConfigLocation() {
-        return customConfigLocation;
-    }
-
-    public void setCustomConfigLocation(String customConfigLocation) {
-        this.customConfigLocation = customConfigLocation;
-    }
-
     /** Session Recovery Object */
     private transient IdleConnectionResiliency sessionRecovery = new IdleConnectionResiliency(this);
 
@@ -2355,15 +2345,6 @@ public class SQLServerConnection implements ISQLServerConnection, java.io.Serial
                 retryExec = sPropValue;
                 //ConfigRead.getInstance().setCustomRetryRules(sPropValue);
                 ConfigRead.getInstance().setFromConnectionString(sPropValue);
-
-                sPropKey = SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.toString();
-                sPropValue = activeConnectionProperties.getProperty(sPropKey);
-                if (null == sPropValue) {
-                    sPropValue = SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.getDefaultValue();
-                    activeConnectionProperties.setProperty(sPropKey, sPropValue);
-                }
-                customConfigLocation = sPropValue;
-                ConfigRead.getInstance().setCustomLocation(sPropValue);
 
                 sPropKey = SQLServerDriverBooleanProperty.CALC_BIG_DECIMAL_PRECISION.toString();
                 sPropValue = activeConnectionProperties.getProperty(sPropKey);

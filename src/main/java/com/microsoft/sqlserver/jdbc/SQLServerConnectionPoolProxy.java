@@ -735,27 +735,6 @@ class SQLServerConnectionPoolProxy implements ISQLServerConnection, java.io.Seri
     }
 
     /**
-     * Returns the current value for 'calcBigDecimalPrecision'.
-     *
-     * @return customConfigLocation
-     *         a boolean
-     */
-    @Override
-    public String getCustomConfigLocation() {
-        return wrappedConnection.getCustomConfigLocation();
-    }
-
-    /**
-     * Sets the current value of 'calculateBigDecimalPrecision' for the driver.
-     *
-     * @param customConfigLocation
-     */
-    @Override
-    public void setCustomConfigLocation(String customConfigLocation) {
-        wrappedConnection.setCustomConfigLocation(customConfigLocation);
-    }
-
-    /**
      * Returns the useBulkCopyForBatchInsert value.
      * 
      * @return flag for using Bulk Copy API for batch insert operations.

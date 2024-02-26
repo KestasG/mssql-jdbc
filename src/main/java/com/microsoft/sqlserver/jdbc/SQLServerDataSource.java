@@ -1388,29 +1388,6 @@ public class SQLServerDataSource
     }
 
     /**
-     * Sets the 'customConfigLocation' setting.
-     *
-     * @param customConfigLocation
-     *        boolean property to have the driver calculate a big decimal's precision from input
-     */
-    @Override
-    public void setCustomConfigLocation(String customConfigLocation) {
-        setStringProperty(connectionProps, SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.toString(),
-                customConfigLocation);
-    }
-
-    /**
-     * Returns the value for 'customConfigLocation'.
-     *
-     * @return computeBigDecimal boolean value
-     */
-    @Override
-    public String getCustomConfigLocation() {
-        return getStringProperty(connectionProps, SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.toString(),
-                SQLServerDriverStringProperty.CUSTOM_CONFIG_LOCATION.getDefaultValue());
-    }
-
-    /**
      * Sets a property string value.
      *
      * @param props

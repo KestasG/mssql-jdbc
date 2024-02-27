@@ -1,5 +1,6 @@
 package com.microsoft.sqlserver.jdbc;
 
+import javax.print.DocFlavor;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
@@ -44,21 +45,29 @@ public class ConfigRetryRule {
         temp = temp.replace("}", "");
         temp = temp.trim();
 
+        // We want to do an empty string check here
+
+        if (temp.isEmpty()) {
+
+        }
+
         return temp.split(":");
     }
 
     private void addElements(String[] s) throws SQLServerException {
         //+"retryExec={2714,2716:1,2*2:CREATE;2715:1,3;+4060,4070};"
         if (s.length == 1) {
-            // Only the rule has been supplied, so we assume its connection (but what if its not?)
             isConnection = true;
-            retryError = appendOrReplace(s[0]); //Not quite, 1st we see if append on replace.
+            retryError = appendOrReplace(s[0]);
         } else if (s.length == 2 || s.length == 3) {
-            // Retry options have been provided
-            // TODO: HANDLE MISSING VALUES
-            retryError = s[0];
+            // Parse first element (statement rules)
+            if (!StringUtils.isNumeric(s[0])) {
+                // TODO - first argument is not numeric, return some error
+            } else {
+                retryError = s[0];
+            }
 
-            //parse timing elements - COUNT AND INITIAL TIME BOTH MANDATORY
+            // Parse second element (retry options)
             String[] st = s[1].split(",");
 
             // We have retry count AND timing rules
@@ -105,10 +114,9 @@ public class ConfigRetryRule {
     }
 
     private String appendOrReplace(String s) {
-        if (s.isEmpty())
-            return s;
         if (s.charAt(0) == '+') {
             replaceExisting = false;
+            StringUtils.isNumeric(s.substring(1));
             return s.substring(1);
         } else {
             replaceExisting = true;

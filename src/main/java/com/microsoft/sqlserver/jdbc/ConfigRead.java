@@ -23,12 +23,12 @@ public class ConfigRead {
     private static HashMap<Integer,ConfigRetryRule> cxnRules = new HashMap<>();
     private static HashMap<Integer,ConfigRetryRule> stmtRules = new HashMap<>();
 
-    private ConfigRead() {
+    private ConfigRead() throws SQLServerException {
         timeRead = new Date().getTime();
         readConfig();
     }
 
-    public static synchronized ConfigRead getInstance() {
+    public static synchronized ConfigRead getInstance() throws SQLServerException {
         if (single_instance == null) {
             single_instance = new ConfigRead();
         } else {
@@ -38,7 +38,7 @@ public class ConfigRead {
         return single_instance;
     }
 
-    public void setCustomRetryRules(String cRR) {
+    public void setCustomRetryRules(String cRR) throws SQLServerException {
         customRetryRules = cRR;
         readConfig();
     }
@@ -57,7 +57,7 @@ public class ConfigRead {
         }
     }
 
-    private static void reread() {
+    private static void reread() throws SQLServerException {
         long currentTime = new Date().getTime();
 
         if ((currentTime - timeRead) >= timeToRead && !compareModified()) {
@@ -74,7 +74,7 @@ public class ConfigRead {
         return lastQuery;
     }
 
-    private static void readConfig() {
+    private static void readConfig() throws SQLServerException {
         LinkedList<String> temp = null;
 
         if (!customRetryRules.isEmpty()) {
@@ -96,7 +96,7 @@ public class ConfigRead {
         }
     }
 
-    private static void createRules(LinkedList<String> list) {
+    private static void createRules(LinkedList<String> list) throws SQLServerException {
         cxnRules = new HashMap<>();
         stmtRules = new HashMap<>();
 
@@ -183,7 +183,7 @@ public class ConfigRead {
         return list;
     }
 
-    public ConfigRetryRule searchRuleSet(int ruleToSearch, String ruleSet) {
+    public ConfigRetryRule searchRuleSet(int ruleToSearch, String ruleSet) throws SQLServerException {
         reread();
         if (ruleSet.equals("statement")) {
             for (Map.Entry<Integer, ConfigRetryRule> entry : stmtRules.entrySet()) {

@@ -12,35 +12,69 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class ConfigRead {
-    private final static int timeToRead = 30000; //In ms
-    private final static String defaultName = "mssql-jdbc.properties";
-    private static ConfigRead single_instance = null;
-    private static long timeRead;
-    private static String lastQuery = "";
+    private final static int intervalBetweenReads = 30000; // How many ms must have elapsed before we re-read
+    private final static String defaultPropsFile = "mssql-jdbc.properties";
+    private static ConfigRead driverInstance = null;
     private static long timeLastModified;
-    private static String customRetryRules = "";
-    private static boolean replaceFlag; // Are we replacing the list of transient errors?
+    private static long lastTimeRead;
+    private static String lastQuery = "";
+    private static String customRetryRules = ""; // Rules imported from connection string
+    private static boolean replaceFlag; // Are we replacing the list of transient errors (for connection retry)?
     private static HashMap<Integer,ConfigRetryRule> cxnRules = new HashMap<>();
     private static HashMap<Integer,ConfigRetryRule> stmtRules = new HashMap<>();
 
     private ConfigRead() throws SQLServerException {
-        timeRead = new Date().getTime();
-        readConfig();
+        // On instantiation, set last time read and set up rules
+        lastTimeRead = new Date().getTime();
+        setUpRules();
     }
 
+    /**
+     * Fetches the static instance of ConfigRead, instantiating it if it hasn't already been.
+     *
+     * @return The static instance of ConfigRead
+     * @throws SQLServerException
+     */
     public static synchronized ConfigRead getInstance() throws SQLServerException {
-        if (single_instance == null) {
-            single_instance = new ConfigRead();
+        // Every time we fetch this static instance, instantiate if it hasn't been. If it has then re-read and return
+        // the instance.
+        if (driverInstance == null) {
+            driverInstance = new ConfigRead();
         } else {
             reread();
         }
 
-        return single_instance;
+        return driverInstance;
+    }
+
+    /**
+     * Check if it's time to re-read, and if the file has changed. If so, then re-set up rules.
+     *
+     * @throws SQLServerException
+     */
+    private static void reread() throws SQLServerException {
+        long currentTime = new Date().getTime();
+
+        if ((currentTime - lastTimeRead) >= intervalBetweenReads && !compareModified()) {
+            lastTimeRead = currentTime;
+            setUpRules();
+        }
+    }
+
+    private static boolean compareModified() {
+        String inputToUse = getCurrentClassPath() + defaultPropsFile;
+
+        try {
+            File f = new File(inputToUse);
+            return f.lastModified() == timeLastModified;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void setCustomRetryRules(String cRR) throws SQLServerException {
         customRetryRules = cRR;
-        readConfig();
+        setUpRules();
     }
 
     public void setFromConnectionString(String custom) throws SQLServerException {
@@ -57,14 +91,7 @@ public class ConfigRead {
         }
     }
 
-    private static void reread() throws SQLServerException {
-        long currentTime = new Date().getTime();
 
-        if ((currentTime - timeRead) >= timeToRead && !compareModified()) {
-            timeRead = currentTime;
-            readConfig();
-        }
-    }
 
     public void storeLastQuery(String sql) {
         lastQuery = sql.toLowerCase();
@@ -74,11 +101,11 @@ public class ConfigRead {
         return lastQuery;
     }
 
-    private static void readConfig() throws SQLServerException {
+    private static void setUpRules() throws SQLServerException {
         LinkedList<String> temp = null;
 
         if (!customRetryRules.isEmpty()) {
-            // If user as set custom rules in conn string, then we use those over any file
+            // If user as set custom rules in connection string, then we use those over any file
             temp = new LinkedList<>();
             for (String s : customRetryRules.split(";")) {
                 temp.add(s);
@@ -145,23 +172,12 @@ public class ConfigRead {
         return null;
     }
 
-    private static boolean compareModified() {
-        String inputToUse = getCurrentClassPath() + defaultName;
-
-        try {
-            File f = new File(inputToUse);
-            return f.lastModified() == timeLastModified;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     private static LinkedList<String> readFromFile() throws IOException {
         String filePath = getCurrentClassPath();
 
         LinkedList<String> list = new LinkedList<>();
         try {
-            File f = new File(filePath + defaultName);
+            File f = new File(filePath + defaultPropsFile);
             timeLastModified = f.lastModified();
             try (BufferedReader buffer = new BufferedReader(new FileReader(f))) {
                 String readLine;

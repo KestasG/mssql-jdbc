@@ -26,6 +26,7 @@ public class CRL {
                 createTable(s);
             } catch (SQLServerException e) {
                 ps.execute();
+                dropTable(s);
             }
         }
     }

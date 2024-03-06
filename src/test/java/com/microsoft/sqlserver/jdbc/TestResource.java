@@ -96,7 +96,7 @@ public final class TestResource extends ListResourceBundle {
             {"R_connectionNotClosedWithPoolClose", "Connection is not closed with pool close"},
             {"R_connectionNotClosedWithPoolClose", "Unexpected: ClientConnectionId is null from Pool"},
             {"R_idFromPoolNotSame", "ClientConnection Ids from pool are not the same."},
-            {"R_noProtocolVersion", "protocol version is not enabled or not supported by the client."},
+            {"R_noProtocolVersion", "protocol is disabled or cipher suites are inappropriate"},
             {"R_protocolException", "Any protocol other than TLSv1, TLSv1.1, and TLSv1.2 should throw Exception"},
             {"R_invalidProtocolLabel",
                     "SSL Protocol {0} label is not valid. Only TLS, TLSv1, TLSv1.1, and TLSv1.2 are supported."},

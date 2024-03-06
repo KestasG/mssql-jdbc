@@ -22,11 +22,7 @@ import java.sql.SQLType;
 import java.sql.SQLXML;
 import java.sql.Statement;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 import java.util.logging.Level;
 
 import com.microsoft.sqlserver.jdbc.SQLServerConnection.CityHash128Key;
@@ -379,13 +375,47 @@ public class SQLServerPreparedStatement extends SQLServerStatement implements IS
      */
     private boolean buildPreparedStrings(Parameter[] params, boolean renewDefinition) throws SQLServerException {
         String newTypeDefinitions = buildParamTypeDefinitions(params, renewDefinition);
-        if (null != preparedTypeDefinitions && newTypeDefinitions.equalsIgnoreCase(preparedTypeDefinitions))
-            return false;
+
+        //if (null != preparedTypeDefinitions && newTypeDefinitions.equalsIgnoreCase(preparedTypeDefinitions))
+        //    return false;
+
+
+
+        Map<Object, Integer> cache = new IdentityHashMap<>();
+        Map<Integer, Integer> indexToParamMap = new HashMap<>();
+        Integer index = 0;
+        Integer colapsed = 0;
+        for (Parameter param : params) {
+            Integer cachedIndex = index;
+            try {
+                Object value = param.getSetterValue();
+                if (value != null) {
+                    cachedIndex = cache.get(value);
+                    if (cachedIndex == null) {
+                        cachedIndex = index;
+                        cache.put(value, cachedIndex);
+                    }else{
+                        colapsed++;
+                    }
+                }
+            }catch (NullPointerException e){
+              //  System.out.println(e);
+            }
+            indexToParamMap.put(index, cachedIndex);
+            index++;
+        }
+        //if cache size same as paramss size, means we didn't 'compress' any parameters, do original check'
+        if(colapsed == 0){
+           if (null != preparedTypeDefinitions && newTypeDefinitions.equalsIgnoreCase(preparedTypeDefinitions))
+                return false;
+        }else{
+            System.out.println("BBBBBBBBBBBBIIIIIINNNNNGOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+        }
 
         preparedTypeDefinitions = newTypeDefinitions;
 
         /* Replace the parameter marker '?' with the param numbers @p1, @p2 etc */
-        preparedSQL = connection.replaceParameterMarkers(userSQL, userSQLParamPositions, params, bReturnValueSyntax);
+        preparedSQL = connection.replaceParameterMarkers(userSQL, userSQLParamPositions, params, bReturnValueSyntax, indexToParamMap);
         if (bRequestedGeneratedKeys)
             preparedSQL = preparedSQL + identityQuery;
 

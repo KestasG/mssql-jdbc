@@ -28,16 +28,7 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
@@ -6043,7 +6034,7 @@ public class SQLServerConnection implements ISQLServerConnection, java.io.Serial
     static final char[] OUT = {' ', 'O', 'U', 'T'};
 
     String replaceParameterMarkers(String sqlSrc, int[] paramPositions, Parameter[] params,
-            boolean isReturnValueSyntax) throws SQLServerException {
+                                   boolean isReturnValueSyntax, Map<Integer, Integer> indexToParamMap) throws SQLServerException {
         final int MAX_PARAM_NAME_LEN = 6;
         char[] sqlDst = new char[sqlSrc.length() + params.length * (MAX_PARAM_NAME_LEN + OUT.length)];
         int dstBegin = 0;
@@ -6059,7 +6050,11 @@ public class SQLServerConnection implements ISQLServerConnection, java.io.Serial
             if (sqlSrc.length() == srcEnd)
                 break;
 
-            dstBegin += makeParamName(nParam++, sqlDst, dstBegin);
+            //remap param
+            if(indexToParamMap != null)
+                dstBegin += makeParamName(indexToParamMap.get(nParam++), sqlDst, dstBegin);
+            else
+                dstBegin += makeParamName(nParam++, sqlDst, dstBegin);
             srcBegin = srcEnd + 1;
 
             if (params[paramIndex++].isOutput()) {

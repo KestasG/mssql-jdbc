@@ -290,6 +290,9 @@
 		</profile>
 		<profile>
 			<id>jre11</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<build>
 				<finalName>${project.artifactId}-${project.version}.jre11${releaseExt}</finalName>
 				<plugins>
@@ -323,9 +326,7 @@
 		</profile>
 		<profile>
 			<id>jre15</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+
 			<build>
 				<finalName>${project.artifactId}-${project.version}.jre15${releaseExt}</finalName>
 				<plugins>
@@ -422,6 +423,10 @@
 				<configuration>
 					<forkCount>3</forkCount>
 					<reuseForks>true</reuseForks>
+					<trimStackTrace>false</trimStackTrace>
+					<systemPropertyVariables>
+					<mssql_jdbc_test_connection_properties>jdbc:sqlserver://192.168.1.137:1433;database=test;encrypt=false;user=testuser;password=Te$tuser1</mssql_jdbc_test_connection_properties >
+					</systemPropertyVariables>
 					<argLine>${argLine} --illegal-access=permit -Xmx1024m
 						-XX:MaxPermSize=256m -Djava.library.path=${dllPath}
 					</argLine>

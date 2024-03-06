@@ -47,7 +47,7 @@ public class SSLProtocolTest extends AbstractTest {
             // the connection will fail if we enable only TLSv1.2
             assertTrue(e.getMessage().contains(TestResource.getResource("R_noProtocolVersion"))
                     || e.getCause().getMessage().contains(TestResource.getResource("R_connectionClosed"))
-                    || e.getCause().getCause().getMessage().contains(TestResource.getResource("R_connectionClosed")));
+                   );
         }
     }
 

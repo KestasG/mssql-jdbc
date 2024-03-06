@@ -17,7 +17,7 @@ import java.sql.BatchUpdateException;
  * That is, they should throw an exception, be a no-op, or whatever.
  */
 
-final class DriverJDBCVersion {
+final class DriverJDBCVersion42 {
     // The 4.2 driver is compliant to JDBC 4.2.
     static final int major = 4;
     static final int minor = 2;
